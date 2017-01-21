@@ -18,7 +18,6 @@ docker run \
 --restart unless-stopped \
 -d \
 -e "ENABLED_PLUGINS=AdminerDockerLinks" \
--v ${PWD}/plugins.php:/plugins/load.php:ro \
 maienm/adminer
 
 docker run \
