@@ -21,7 +21,7 @@ docker run \
 --name adminer \
 --restart unless-stopped \
 -d \
--e "ENABLE_PLUGINS=AdminerDockerLinks" \
+-e "ENABLED_PLUGINS=AdminerDockerLinks" \
 -v ${PWD}/plugins.php:/plugins/load.php:ro \
 maienm/adminer
 
