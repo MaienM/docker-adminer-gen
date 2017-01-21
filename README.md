@@ -8,9 +8,9 @@ In addition, if the environment variable `MOUNT_AT` is set, the plugin file and 
 
 ## Usage
 
-It is advised to use this image in conjunction with [MaienM/docker-adminer](https://github.com/MaienM/docker-adminer).  This image makes it easy to add plugins (such as this one), and it contains everything necessary for the database types supported by this image.
+It is advised to use this image in conjunction with [maienm/adminer](https://hub.docker.com/r/maienm/adminer).  This image makes it easy to add plugins (such as this one), and it contains everything necessary for the database types supported by this image.
 
-### Example with MaienM/docker-adminer
+### Example with maienm/adminer
 
 ```bash
 docker run \
