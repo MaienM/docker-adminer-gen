@@ -54,15 +54,15 @@ class Container < Docker::Container
 	end
 
 	def user
-		return cred(:user)
+		return env[ENV_USER] || field(:user)
 	end
 
 	def pass
-		return cred(:pass)
+		return env[ENV_PASS] || field(:pass)
 	end
 
 	def db
-		return env[ENV_DB] || ''
+		return env[ENV_DB] || field(:db)
 	end
 
 	def to_adminer
@@ -103,24 +103,19 @@ class Container < Docker::Container
 		return json['Config']['Env'].map { |e| e.split('=', 2) }.to_h
 	end
 
-	def cred(field)
-		# Get the credentials definition for this field
-		cred = type.cred[field] || {}
+	def field(field)
+		# Get the fields definition for this field
+		fields = type.fields[field] || {}
 
-		# Get all environment variables that have to be check for this field
+		# Get all environment variables that have to be checked for this field
 		vars = []
-		vars << case field
-			when :user then ENV_USER
-			when :pass then ENV_PASS
-			else fail "Invalid field #{field}"
-		end
-		vars << cred[:env]
+		vars << fields[:env]
 
 		# Try to get the field using each of the variables, and fallback to the default value or empty
 		vars.flatten.compact.each do |v|
 			return env[v] if env.include?(v)
 		end
-		return cred[:default] || ''
+		return fields[:default] || ''
 	end
 
 	class << self

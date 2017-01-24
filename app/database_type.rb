@@ -1,5 +1,5 @@
 class DatabaseType
-	attr_reader :name, :engine, :port, :cred
+	attr_reader :name, :engine, :port, :fields
 
 	private
 
@@ -7,7 +7,7 @@ class DatabaseType
 		@name = options[:name]
 		@engine = options[:engine] || @name
 		@port = options[:port]
-		@cred = options[:cred] || {}
+		@fields = options[:fields] || {}
 	end
 
 	class << self
@@ -21,9 +21,12 @@ class DatabaseType
 	FIREBIRD = new(
 		name: :firebird, 
 		port: 3050,
-		cred: {
-			user: { env: 'ISC_USER' },
-			pass: { env: 'ISC_PASSWD' }
+		fields: {
+			user: { default: 'SYSDBA' },
+			pass: {
+				env: 'FIREBIRD_PASSWORD',
+				default: 'masterkey'
+			}
 		}
 	)
 	MONGODB = new(
@@ -34,7 +37,7 @@ class DatabaseType
 	MSSQL = new(
 		name: :mssql,
 		port: 1433,
-		cred: {
+		fields: {
 			user: { default: 'sa' },
 			pass: { env: 'SA_PASS' }
 		}
@@ -43,15 +46,19 @@ class DatabaseType
 		name: :mysql,
 		engine: :server,
 		port: 3306,
-		cred: {
-			user: { default: 'root' },
-			pass: { env: 'MYSQL_ROOT_PASSWORD' }
+		fields: {
+			user: {
+				env: 'MYSQL_USER',
+				default: 'root'
+			},
+			pass: { env: %w(MYSQL_PASSWORD MYSQL_ROOT_PASSWORD) },
+			db: { env: 'MYSQL_DATABASE' }
 		}
 	)
 	ORACLE = new(
 		name: :oracle,
 		port: 1521,
-		cred: {
+		fields: {
 			user: { default: 'system' },
 			pass: { default: 'oracle' }
 		}
@@ -60,12 +67,16 @@ class DatabaseType
 		name: :postgres,
 		engine: :pgsql,
 		port: 5432,
-		cred: {
+		fields: {
 			user: {
 				env: 'POSTGRES_USER',
 				default: 'postgres'
 			},
-			pass: { env: 'POSTGRES_PASS' }
+			pass: { env: 'POSTGRES_PASSWORD' },
+			db: {
+				env: %w(POSTGRES_DB POSTGRES_USER),
+				default: 'postgres'
+			}
 		}
 	)
 end
