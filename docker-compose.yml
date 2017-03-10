@@ -1,0 +1,32 @@
+version: '2'
+
+services:
+  adminer:
+    image: maienm/adminer
+    container_name: adminer
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    environment:
+      ENABLED_PLUGINS: AdminerDockerLinks
+    networks:
+      - adminer
+
+  adminer-gen:
+    image: maienm/adminer-gen
+    container_name: adminer-gen
+    restart: unless-stopped
+    volumes_from:
+      - adminer
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      ADMINER_CONTAINER: adminer
+      MOUNT_AT: /plugins/docker-gen
+    networks:
+      - adminer
+
+networks:
+  adminer:
+    external:
+      name: adminer

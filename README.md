@@ -24,9 +24,9 @@ docker run \
 --name adminer-gen \
 --restart unless-stopped \
 -d \
---link adminer:adminer \
 --volumes-from adminer \
 -v /var/run/docker.sock:/var/run/docker.sock:ro \
+-e "ADMINER_CONTAINER=adminer" \
 -e "MOUNT_AT=/plugins/docker-gen" \
 maienm/adminer-gen
 ```
