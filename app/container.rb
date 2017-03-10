@@ -1,3 +1,4 @@
+require 'pp'
 require './database_type'
 
 class Container < Docker::Container
@@ -30,12 +31,12 @@ class Container < Docker::Container
 	def host
 		return env[ENV_HOST] if env.include?(ENV_HOST)
 
-		ips = info['NetworkSettings']['Networks'].map { |k, v| [k.downcase, v['IPAddress']] }.to_h
-		return self.class.adminer.networks.map { |n| ips[n.downcase] }.compact.first
+		ips = networks.map { |k, v| [k.downcase, v['IPAddress']] }.to_h
+		return self.class.adminer.networks.keys.map { |n| ips[n.downcase] }.compact.first
 	end
 
 	def networks
-		return info['NetworkSettings'].keys
+		return info['NetworkSettings']['Networks']
 	end
 
 	def ports
@@ -71,6 +72,11 @@ class Container < Docker::Container
 		return if special?
 
 		puts "Found adminer enabled container with name #{name} (#{id})"
+		unless host && port
+			puts "However, no host for this container is reachable from the adminer container"
+			puts "Do they share a network?"
+			return
+		end
 		data = {
 			name: name,
 			engine: type.engine,
@@ -79,7 +85,7 @@ class Container < Docker::Container
 			password: pass,
 			db: db,
 		}
-		puts "Contained database is #{type}, available at #{host}:#{port}"
+		puts "Contained database is #{type.name}, available at #{host}:#{port}"
 		return data
 	rescue => e
 		puts e.message
@@ -120,12 +126,16 @@ class Container < Docker::Container
 
 	class << self
 		def current
-			return get(ENV['HOSTNAME'])
+			return realget(ENV['HOSTNAME'])
 		end
 
 		def adminer
-			# TODO
-			return get(ENV['ADMINER_NAME'] || ENV['HOSTNAME'])
+			return realget(ENV['ADMINER_CONTAINER'])
+		end
+
+		def realget(name)
+			container = get(name)
+			return all.select { |c| c.id == container.id }.first
 		end
 	end
 end
