@@ -39,7 +39,7 @@ class DatabaseType
 		port: 1433,
 		fields: {
 			user: { default: 'sa' },
-			pass: { env: 'SA_PASS' }
+			pass: { env: %w(SA_PASS SA_PASSWORD) }
 		}
 	)
 	MYSQL = new(
